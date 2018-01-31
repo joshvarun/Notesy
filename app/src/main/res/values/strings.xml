@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Notesy</string>
+
+    <string name="note_title_hint">Title</string>
+    <string name="note_description_hint">Description</string>
+    <string name="note_reminder_hint">Set a Reminder</string>
+    <string name="note_image_hint">Add an image</string>
+</resources>
