@@ -17,7 +17,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.TaskViewActivity" />
-        <activity android:name=".activity.NewNoteActivity"></activity>
+        <activity android:name=".activity.NewNoteActivity"/>
+
+        <receiver android:name=".activity.AlarmReceiver"/>
     </application>
 
 </manifest>
