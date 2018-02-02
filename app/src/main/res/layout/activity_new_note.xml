@@ -33,7 +33,6 @@
         android:ems="10"
         android:hint="@string/note_title_hint"
         android:inputType="text"
-        android:textColorHint="@color/text_color"
         app:layout_constraintEnd_toEndOf="@+id/note_bg"
         app:layout_constraintStart_toStartOf="@+id/note_bg"
         app:layout_constraintTop_toTopOf="@+id/note_bg" />
@@ -104,13 +103,31 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="28dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="#4CAF50"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/fab_deleteNote"
         app:srcCompat="@drawable/ic_tick" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_deleteNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="#B71C1C"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fab_saveNote"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_delete" />
 
     <TextView
         android:id="@+id/add_note_title"
@@ -123,8 +140,19 @@
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.39"
+        app:layout_constraintStart_toEndOf="@+id/img_back"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_back" />
 
 
 </android.support.constraint.ConstraintLayout>

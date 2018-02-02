@@ -1,15 +1,20 @@
 package com.varunjoshi.notesy.activity;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,13 +22,22 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.varunjoshi.notesy.R;
+import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
+import com.varunjoshi.notesy.activity.Util.Util;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,7 +45,8 @@ import butterknife.OnClick;
 
 public class NewNoteActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
-
+    public static final int REQUEST_TAKE_PHOTO = 0;
+    public static final int REQUEST_PICK_PHOTO = 1;
     private static final String TAG = "NewNoteActivity";
     @BindView(R.id.note_bg)
     ImageView mNoteBg;
@@ -49,13 +64,18 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     ImageView mSelectImage;
     @BindView(R.id.fab_saveNote)
     FloatingActionButton mFabSaveNote;
-
     FontFamily mFontFamily;
     @BindView(R.id.add_note_title)
     TextView mAddNoteTitle;
-
+    @BindView(R.id.fab_deleteNote)
+    FloatingActionButton mFabDeleteNote;
+    @BindView(R.id.img_back)
+    ImageView mImgBack;
+    AppDatabase mAppDatabase;
+    private Uri mMediaUri;
     private Date mUserReminderDate;
     private long reminderTimestamp;
+    private boolean hasReminder, hasImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +94,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    hasReminder = true;
                     Calendar now = Calendar.getInstance();
                     DatePickerDialog dpd = DatePickerDialog.newInstance(
                             NewNoteActivity.this,
@@ -81,26 +102,88 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                             now.get(Calendar.MONTH),
                             now.get(Calendar.DAY_OF_MONTH)
                     );
-                    dpd.show(getFragmentManager(), "Datepickerdialog");
+                    dpd.show(getFragmentManager(), TAG);
+                } else {
+                    hasReminder = false;
+                    mTextReminder.setText(getResources().getString(R.string.note_reminder_hint));
                 }
             }
         });
+
+        mAppDatabase = AppDatabase.getAppDatabase(this);
     }
 
 
     @OnClick(R.id.select_image)
     public void onMSelectImageClicked() {
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.MANAGE_DOCUMENTS
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
 
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+
+            }
+        }).check();
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Image");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals("Take Photo")) {
+                    takePicture();
+                } else if (options[item].equals("Choose from Gallery")) {
+                    pickImage();
+                }
+            }
+        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
     @OnClick(R.id.fab_saveNote)
     public void onMFabSaveNoteClicked() {
-    }
+        Note note = new Note();
+        note.setNote_title(mEdtNoteTitle.getText().toString().trim());
+        note.setNote_description(mEdtNoteDescription.getText().toString().trim());
+        if (hasImage) {
+            note.setHasImage(true);
+            note.setImage_path(mMediaUri.getPath());
+        } else
+            note.setHasImage(false);
+        if (hasReminder) {
+            note.setHasReminder(true);
+            note.setTimestamp(reminderTimestamp);
+        } else {
+            Calendar c = Calendar.getInstance();
+            note.setHasReminder(false);
+            note.setTimestamp(c.getTimeInMillis());
+        }
 
+        mAppDatabase.mNoteDao().insert(note);
+
+        finish();
+
+    }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        mTextReminder.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+        mTextReminder.setText(MessageFormat.format("{0}/{1}/{2}", dayOfMonth,
+                monthOfYear + 1, year));
         setDate(year, monthOfYear, dayOfMonth);
         Calendar now = Calendar.getInstance();
         TimePickerDialog tpd = TimePickerDialog.newInstance(
@@ -110,9 +193,11 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 true
         );
         tpd.show(getFragmentManager(), "Datepickerdialog");
+
         tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
+                hasReminder = false;
                 Log.d(TAG, "Dialog was cancelled");
                 Toast.makeText(NewNoteActivity.this, "Please select time to set a reminder.",
                         Toast.LENGTH_SHORT).show();
@@ -125,7 +210,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     @Override
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
         String s = mTextReminder.getText().toString();
-        mTextReminder.setText(s + " " + hourOfDay + ":" + minute);
+        mTextReminder.setText(MessageFormat.format("{0} {1}:{2}", s, hourOfDay, minute));
         setTime(hourOfDay, minute);
     }
 
@@ -182,7 +267,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         if (note_title.length() == 0) {
             note_title = "";
         }
-        if (note_description.length() == 0){
+        if (note_description.length() == 0) {
             Toast.makeText(this, "Please write a note!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -194,5 +279,82 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimestamp, pendingIntent);
         }
 
+    }
+
+    void takePicture() {
+        mMediaUri = Util.getMediaOutputUri(this);
+        if (mMediaUri == null) {
+            // error
+            Toast.makeText(this, "There was a problem accessing your device's storage."
+                    , Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+        }
+    }
+
+    void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_PICK_PHOTO);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_TAKE_PHOTO:
+                    Log.d(TAG, "onActivityResult: " + mMediaUri);
+                    hasImage = true;
+                    break;
+                case REQUEST_PICK_PHOTO:
+                    mMediaUri = data.getData();
+                    hasImage = true;
+                    break;
+
+            }
+        }
+
+    }
+
+    @OnClick({R.id.fab_deleteNote, R.id.img_back})
+    public void onViewClicked(View view) {
+        AlertDialog.Builder builder;
+        switch (view.getId()) {
+            case R.id.fab_deleteNote:
+                builder = new AlertDialog.Builder(this);
+                builder.setTitle("Alert")
+                        .setMessage("Unsaved changes will be lost.")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+                break;
+            case R.id.img_back:
+
+                builder = new AlertDialog.Builder(this);
+                builder.setTitle("Alert")
+                        .setMessage("Unsaved changes will be lost.")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+                break;
+        }
     }
 }

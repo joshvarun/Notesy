@@ -1,8 +1,8 @@
 package com.varunjoshi.notesy.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.varunjoshi.notesy.R;
 

@@ -5,9 +5,10 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="16dp"
     android:background="@drawable/rec_shape">
-
 
     <TextView
         android:id="@+id/note_headline"
@@ -26,8 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
         android:maxLines="3"
+        android:layout_marginTop="8dp"
         android:textColor="@color/description_white"
         android:textSize="@dimen/description_text_size"
         app:layout_constraintBottom_toTopOf="@+id/note_timestamp"
@@ -38,27 +39,38 @@
     <TextView
         android:id="@+id/note_timestamp"
         android:layout_width="wrap_content"
-        android:layout_height="23dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:textColor="@color/description_white"
-        android:textSize="@dimen/description_text_size"
+        android:textSize="@dimen/timestamp_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/note_description"
         tools:text="Upcoming in 2 mins" />
 
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="125dp"
+        android:id="@+id/note_image"
+        android:layout_width="81dp"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.833"
         app:layout_constraintStart_toEndOf="@+id/note_headline"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_timer_set"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/note_timestamp"
+        app:srcCompat="@drawable/ic_reminder_set" />
 
 </android.support.constraint.ConstraintLayout>
