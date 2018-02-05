@@ -13,8 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.uniquestudio.library.CircleCheckBox;
 import com.varunjoshi.notesy.R;
+import com.varunjoshi.notesy.activity.AppDatabase;
 import com.varunjoshi.notesy.activity.Model.Note;
+import com.varunjoshi.notesy.activity.TaskViewActivity;
+import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -32,6 +36,8 @@ import java.util.List;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHolder> {
     List<Note> allNotes = new ArrayList<>();
     Context mContext;
+    AppDatabase mAppDatabase;
+    NoteDao mNoteDao;
 
     public NotesAdapter() {
     }
@@ -39,6 +45,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     public NotesAdapter(List<Note> allNotes, Context context) {
         this.allNotes = allNotes;
         this.mContext = context;
+        mAppDatabase = AppDatabase.getAppDatabase(mContext);
+        mNoteDao = mAppDatabase.mNoteDao();
     }
 
     public static String ConvertDateIntoSimpleFormat(String dateTime) {
@@ -76,7 +84,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     @Override
     public void onBindViewHolder(NotesViewHolder holder, int position) {
 
-        Note note = allNotes.get(position);
+            Note note = allNotes.get(position);
         GradientDrawable bgShape = (GradientDrawable) holder.layout.getBackground();
         bgShape.setColor(getMatColor("500"));
         Timestamp timestamp = new Timestamp(note.getTimestamp());
@@ -92,6 +100,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         holder.note_timestamp.setText(dateFormat.format(date));
         if (note.isHasImage())
             Picasso.with(mContext).load(note.getImage_path()).into(holder.note_image);
+
+        // 1 Done
+        // 0 Not Done
+        holder.mCheckBox.setListener(isChecked -> {
+            note.setIsDone(1);
+            mNoteDao.update(note);
+            allNotes.remove(position);
+            notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -116,6 +133,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         ConstraintLayout layout;
         TextView note_headline, note_description, note_timestamp;
         ImageView note_image, timer_set;
+        CircleCheckBox mCheckBox;
 
         public NotesViewHolder(View view) {
             super(view);
@@ -125,6 +143,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             note_timestamp = view.findViewById(R.id.note_timestamp);
             note_image = view.findViewById(R.id.note_image);
             timer_set = view.findViewById(R.id.img_timer_set);
+            mCheckBox = view.findViewById(R.id.setNoteDone);
         }
     }
 

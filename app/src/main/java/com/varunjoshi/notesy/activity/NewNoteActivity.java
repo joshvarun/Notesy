@@ -173,7 +173,9 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             note.setHasReminder(false);
             note.setTimestamp(c.getTimeInMillis());
         }
-
+        // 1 Done
+        // 0 Not Done
+        note.setIsDone(0);
         mAppDatabase.mNoteDao().insert(note);
 
         finish();

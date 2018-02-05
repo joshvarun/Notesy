@@ -20,10 +20,22 @@ public class Note {
     private boolean hasReminder;
     @ColumnInfo(name = "hasImage")
     private boolean hasImage;
+    @ColumnInfo(name = "isDone")
+    private int isDone;
     @ColumnInfo(name = "reminder")
     private long timestamp;
     @ColumnInfo(name = "image_path")
     private String image_path;
+
+    public int getIsDone() {
+        return isDone;
+    }
+
+    public void setIsDone(int isDone) {
+        this.isDone = isDone;
+    }
+    // 1 Done
+    // 0 Not Done
 
     public long getTimestamp() {
         return timestamp;

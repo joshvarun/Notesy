@@ -6,4 +6,7 @@
     <string name="note_reminder_hint">Set a Reminder</string>
     <string name="note_image_hint">Add an image</string>
     <string name="add_note_title">Add Note</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

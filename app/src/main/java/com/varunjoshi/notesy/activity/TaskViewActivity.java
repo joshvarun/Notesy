@@ -1,75 +1,102 @@
 package com.varunjoshi.notesy.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
+import com.varunjoshi.notesy.activity.Adapters.SectionsPagerAdapter;
+import com.varunjoshi.notesy.activity.Fragments.ShowDoneNotes;
+import com.varunjoshi.notesy.activity.Fragments.ShowPendingNotes;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class TaskViewActivity extends AppCompatActivity {
 
-    @BindView(R.id.recyclerView)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.floatingActionButton)
-    FloatingActionButton btn_add_new;
-    @BindView(R.id.no_notes_img)
-    ImageView img_no_notes;
-    @BindView(R.id.no_notes_text)
-    TextView txt_no_notes;
     AppDatabase mAppDatabase;
     NotesAdapter mAdapter;
     NoteDao mNoteDao;
+    @BindView(R.id.tabLayout)
+    TabLayout mTabLayout;
+    @BindView(R.id.pager)
+    ViewPager mPager;
+
+    SectionsPagerAdapter mSectionsPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_view);
-
         ButterKnife.bind(this);
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        mTabLayout.setupWithViewPager(mPager);
+
         mAppDatabase = AppDatabase.getAppDatabase(this);
         mAdapter = new NotesAdapter(new ArrayList<Note>(), this);
 
-        getAllData();
+        setupViewPager();
+
     }
 
-    @OnClick(R.id.floatingActionButton)
-    public void goToAddNewNote() {
-        startActivity(new Intent(TaskViewActivity.this, NewNoteActivity.class));
+    private void setupViewPager() {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new ShowPendingNotes(), "CURRENT");
+        adapter.addFragment(new ShowDoneNotes(), "DONE");
+        mPager.setAdapter(adapter);
+        mPager.setOffscreenPageLimit(2);
+        mTabLayout.setupWithViewPager(mPager);
+        mPager.setCurrentItem(0);
+
+
     }
 
-    public void getAllData() {
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
-        mNoteDao = mAppDatabase.mNoteDao();
-        mNoteDao.getAll().observe(this, notes -> {
-            if (notes != null && notes.size() > 0) {
-                img_no_notes.setVisibility(View.GONE);
-                txt_no_notes.setVisibility(View.GONE);
-                Collections.reverse(notes);
-                mAdapter.setItems(notes);
-            } else {
-                img_no_notes.setVisibility(View.VISIBLE);
-                txt_no_notes.setVisibility(View.VISIBLE);
-            }
-        });
+    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+
 }

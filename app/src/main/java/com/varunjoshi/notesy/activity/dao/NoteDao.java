@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Dao
 public interface NoteDao {
-    @Query("SELECT * FROM notes")
+    @Query("SELECT * FROM notes WHERE isDone=0")
     LiveData<List<Note>> getAll();
 
     @Insert
