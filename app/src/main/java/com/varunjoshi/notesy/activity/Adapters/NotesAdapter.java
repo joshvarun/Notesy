@@ -13,11 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.uniquestudio.library.CircleCheckBox;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.AppDatabase;
 import com.varunjoshi.notesy.activity.Model.Note;
-import com.varunjoshi.notesy.activity.TaskViewActivity;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.sql.Timestamp;
@@ -36,7 +34,7 @@ import java.util.List;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHolder> {
     List<Note> allNotes = new ArrayList<>();
     Context mContext;
-    AppDatabase mAppDatabase;
+    private AppDatabase mAppDatabase;
     NoteDao mNoteDao;
 
     public NotesAdapter() {
@@ -103,12 +101,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
 
         // 1 Done
         // 0 Not Done
-        holder.mCheckBox.setListener(isChecked -> {
+        holder.mCheckBox.setOnClickListener(v -> {
             note.setIsDone(1);
             mNoteDao.update(note);
             allNotes.remove(position);
             notifyDataSetChanged();
         });
+
     }
 
     @Override
@@ -133,7 +132,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         ConstraintLayout layout;
         TextView note_headline, note_description, note_timestamp;
         ImageView note_image, timer_set;
-        CircleCheckBox mCheckBox;
+        ImageView mCheckBox;
 
         public NotesViewHolder(View view) {
             super(view);

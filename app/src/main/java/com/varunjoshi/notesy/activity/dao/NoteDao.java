@@ -20,6 +20,9 @@ public interface NoteDao {
     @Query("SELECT * FROM notes WHERE isDone=0")
     LiveData<List<Note>> getAll();
 
+    @Query("SELECT * FROM notes WHERE isDone=1")
+    LiveData<List<Note>> getCompletedNotes();
+
     @Insert
     void insert(Note note);
 

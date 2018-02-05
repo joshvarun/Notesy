@@ -54,9 +54,9 @@
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="92dp"
+        android:layout_marginStart="60dp"
         android:layout_marginTop="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/circleCheckBox"
         app:layout_constraintStart_toEndOf="@+id/note_headline"
@@ -73,18 +73,32 @@
         app:layout_constraintStart_toEndOf="@+id/note_timestamp"
         app:srcCompat="@drawable/ic_reminder_set" />
 
-    <com.uniquestudio.library.CircleCheckBox
+    <ImageView
         android:id="@+id/setNoteDone"
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        app:border_color="@color/colorAccent"
-        app:tick_color="@color/colorAccent"
-        app:background_color="#F5F5F5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_unchecked" />
+
+    <!--<com.uniquestudio.library.CircleCheckBox-->
+        <!--android:id="@+id/setNoteDone"-->
+        <!--android:layout_width="28dp"-->
+        <!--android:layout_height="28dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--app:border_width="0dp"-->
+        <!--app:tick_color="@color/colorAccent"-->
+        <!--app:background_color="#F5F5F5"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+
 
 </android.support.constraint.ConstraintLayout>

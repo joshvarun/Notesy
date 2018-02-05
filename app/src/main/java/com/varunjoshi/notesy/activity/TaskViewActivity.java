@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
@@ -14,6 +16,7 @@ import com.varunjoshi.notesy.activity.Adapters.SectionsPagerAdapter;
 import com.varunjoshi.notesy.activity.Fragments.ShowDoneNotes;
 import com.varunjoshi.notesy.activity.Fragments.ShowPendingNotes;
 import com.varunjoshi.notesy.activity.Model.Note;
+import com.varunjoshi.notesy.activity.Util.FontFamily;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.util.ArrayList;
@@ -44,6 +47,11 @@ public class TaskViewActivity extends AppCompatActivity {
 
         mTabLayout.setupWithViewPager(mPager);
 
+        Toolbar toolbar = findViewById(R.id.toolbar_TaskViewActivity);
+        TextView toolbar_title = toolbar.findViewById(R.id.toolbar_title);
+        FontFamily fontFamily = new FontFamily(this);
+        fontFamily.setMediumFont(toolbar_title);
+
         mAppDatabase = AppDatabase.getAppDatabase(this);
         mAdapter = new NotesAdapter(new ArrayList<Note>(), this);
 
@@ -53,8 +61,8 @@ public class TaskViewActivity extends AppCompatActivity {
 
     private void setupViewPager() {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ShowPendingNotes(), "CURRENT");
-        adapter.addFragment(new ShowDoneNotes(), "DONE");
+        adapter.addFragment(new ShowPendingNotes(), "Pending");
+        adapter.addFragment(new ShowDoneNotes(), "Completed");
         mPager.setAdapter(adapter);
         mPager.setOffscreenPageLimit(2);
         mTabLayout.setupWithViewPager(mPager);
