@@ -85,7 +85,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         mFontFamily = new FontFamily(this);
 
         mFontFamily.setMediumFont(mAddNoteTitle);
-        mFontFamily.setMediumFont(mEdtNoteTitle);
+        mFontFamily.setRegularFont(mEdtNoteTitle);
         mFontFamily.setRegularFont(mEdtNoteDescription);
         mFontFamily.setLightFont(mTextReminder);
         mFontFamily.setLightFont(mTextAddImage);
@@ -114,72 +114,42 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     }
 
 
-    @OnClick(R.id.select_image)
-    public void onMSelectImageClicked() {
-        Dexter.withActivity(this)
-                .withPermissions(
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.MANAGE_DOCUMENTS
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
-
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-
-            }
-        }).check();
-        final CharSequence[] options = {"Take Photo", "Choose from Gallery"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Image");
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Take Photo")) {
-                    takePicture();
-                } else if (options[item].equals("Choose from Gallery")) {
-                    pickImage();
-                }
-            }
-        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
-    }
 
     @OnClick(R.id.fab_saveNote)
     public void onMFabSaveNoteClicked() {
         Note note = new Note();
-        note.setNote_title(mEdtNoteTitle.getText().toString().trim());
-        note.setNote_description(mEdtNoteDescription.getText().toString().trim());
-        if (hasImage) {
-            note.setHasImage(true);
-            note.setImage_path(mMediaUri.getPath());
-        } else
-            note.setHasImage(false);
-        if (hasReminder) {
-            note.setHasReminder(true);
-            note.setTimestamp(reminderTimestamp);
-        } else {
-            Calendar c = Calendar.getInstance();
-            note.setHasReminder(false);
-            note.setTimestamp(c.getTimeInMillis());
+        if (mEdtNoteTitle.getText().toString().trim().length() == 0){
+            note.setNote_title(null);
+        }else {
+            note.setNote_title(mEdtNoteTitle.getText().toString().trim());
         }
-        // 1 Done
-        // 0 Not Done
-        note.setIsDone(0);
-        mAppDatabase.mNoteDao().insert(note);
+        if(mEdtNoteDescription.getText().toString().trim().length() == 0){
+            Toast.makeText(this, "Please add a description!", Toast.LENGTH_SHORT).show();
+            return;
+        }else {
+            note.setNote_description(mEdtNoteDescription.getText().toString().trim());
 
-        finish();
 
+//        if (hasImage) {
+//            note.setHasImage(true);
+//            note.setImage_path(mMediaUri.getPath());
+//        } else
+//            note.setHasImage(false);
+            if (hasReminder) {
+                note.setHasReminder(true);
+                note.setTimestamp(reminderTimestamp);
+            } else {
+                Calendar c = Calendar.getInstance();
+                note.setHasReminder(false);
+                note.setTimestamp(c.getTimeInMillis());
+            }
+            // 1 Done
+            // 0 Not Done
+            note.setIsDone(0);
+            mAppDatabase.mNoteDao().insert(note);
+
+            finish();
+        }
     }
 
     @Override
@@ -283,25 +253,6 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
 
     }
 
-    void takePicture() {
-        mMediaUri = Util.getMediaOutputUri(this);
-        if (mMediaUri == null) {
-            // error
-            Toast.makeText(this, "There was a problem accessing your device's storage."
-                    , Toast.LENGTH_SHORT).show();
-        } else {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
-            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
-        }
-    }
-
-    void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_PICK_PHOTO);
-    }
-
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (resultCode == RESULT_OK) {
@@ -359,4 +310,65 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 break;
         }
     }
+
+    //
+//    void takePicture() {
+//        mMediaUri = Util.getMediaOutputUri(this);
+//        if (mMediaUri == null) {
+//            // error
+//            Toast.makeText(this, "There was a problem accessing your device's storage."
+//                    , Toast.LENGTH_SHORT).show();
+//        } else {
+//            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//            intent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+//            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+//        }
+//    }
+//
+//    void pickImage() {
+//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//        intent.setType("image/*");
+//        startActivityForResult(intent, REQUEST_PICK_PHOTO);
+//    }
+
+//    @OnClick(R.id.select_image)
+//    public void onMSelectImageClicked() {
+//        Dexter.withActivity(this)
+//                .withPermissions(
+//                        Manifest.permission.CAMERA,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                        Manifest.permission.READ_EXTERNAL_STORAGE,
+//                        Manifest.permission.MANAGE_DOCUMENTS
+//                ).withListener(new MultiplePermissionsListener() {
+//            @Override
+//            public void onPermissionsChecked(MultiplePermissionsReport report) {
+//
+//            }
+//
+//            @Override
+//            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+//
+//            }
+//        }).check();
+//        final CharSequence[] options = {"Take Photo", "Choose from Gallery"};
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Add Image");
+//        builder.setItems(options, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int item) {
+//                if (options[item].equals("Take Photo")) {
+//                    takePicture();
+//                } else if (options[item].equals("Choose from Gallery")) {
+//                    pickImage();
+//                }
+//            }
+//        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.show();
+//    }
 }

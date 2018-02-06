@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.widget.TextView;
 
 import com.varunjoshi.notesy.R;
@@ -52,8 +53,6 @@ public class TaskViewActivity extends AppCompatActivity {
         FontFamily fontFamily = new FontFamily(this);
         fontFamily.setMediumFont(toolbar_title);
 
-        mAppDatabase = AppDatabase.getAppDatabase(this);
-        mAdapter = new NotesAdapter(new ArrayList<Note>(), this);
 
         setupViewPager();
 
@@ -67,8 +66,6 @@ public class TaskViewActivity extends AppCompatActivity {
         mPager.setOffscreenPageLimit(2);
         mTabLayout.setupWithViewPager(mPager);
         mPager.setCurrentItem(0);
-
-
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -106,5 +103,8 @@ public class TaskViewActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
 }

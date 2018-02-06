@@ -1,6 +1,8 @@
 package com.varunjoshi.notesy.activity.Adapters;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -9,18 +11,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.AppDatabase;
+import com.varunjoshi.notesy.activity.MainActivity;
 import com.varunjoshi.notesy.activity.Model.Note;
+import com.varunjoshi.notesy.activity.Util.FontFamily;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,38 +36,20 @@ import java.util.List;
  */
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHolder> {
-    List<Note> allNotes = new ArrayList<>();
-    Context mContext;
-    private AppDatabase mAppDatabase;
-    NoteDao mNoteDao;
+    private List<Note> allNotes = new ArrayList<>();
+    private Context mContext;
+    private NoteDao mNoteDao;
+    private boolean isCompleted;
 
     public NotesAdapter() {
     }
 
-    public NotesAdapter(List<Note> allNotes, Context context) {
+    public NotesAdapter(List<Note> allNotes, boolean isCompleted, Context context) {
         this.allNotes = allNotes;
         this.mContext = context;
-        mAppDatabase = AppDatabase.getAppDatabase(mContext);
-        mNoteDao = mAppDatabase.mNoteDao();
-    }
-
-    public static String ConvertDateIntoSimpleFormat(String dateTime) {
-        String result = "";
-
-        String date = dateTime;//"2013-09-06'T'14:15:11.557'Z'";
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Date d = null;
-        try {
-            d = df.parse(date);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        df = new SimpleDateFormat("dd/MM/yyyy, hh:mm aa");
-
-        result = df.format(d);
-
-        return result;
+        this.isCompleted = isCompleted;
+        AppDatabase appDatabase = AppDatabase.getAppDatabase(mContext);
+        mNoteDao = appDatabase.mNoteDao();
     }
 
     public void setItems(List<Note> notes) {
@@ -82,11 +68,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     @Override
     public void onBindViewHolder(NotesViewHolder holder, int position) {
 
-            Note note = allNotes.get(position);
+        Note note = allNotes.get(position);
         GradientDrawable bgShape = (GradientDrawable) holder.layout.getBackground();
         bgShape.setColor(getMatColor("500"));
         Timestamp timestamp = new Timestamp(note.getTimestamp());
-        holder.note_headline.setText(note.getNote_title());
+        if (note.getNote_title() == null)
+            holder.note_headline.setVisibility(View.GONE);
+        else
+            holder.note_headline.setText(note.getNote_title());
         holder.note_description.setText(note.getNote_description());
         if (note.isHasReminder())
             holder.timer_set.setVisibility(View.VISIBLE);
@@ -101,13 +90,42 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
 
         // 1 Done
         // 0 Not Done
-        holder.mCheckBox.setOnClickListener(v -> {
-            note.setIsDone(1);
-            mNoteDao.update(note);
-            allNotes.remove(position);
-            notifyDataSetChanged();
-        });
 
+        if (isCompleted) {
+            holder.mCheckBox.setVisibility(View.GONE);
+        } else {
+            holder.mCheckBox.setOnClickListener(v -> {
+                note.setIsDone(1);
+                mNoteDao.update(note);
+                allNotes.remove(position);
+                notifyDataSetChanged();
+            });
+        }
+
+        holder.layout.setOnLongClickListener(v -> {
+            final Dialog dia = new Dialog(mContext);
+            dia.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dia.setContentView(R.layout.alert_dialog);
+
+
+            LinearLayout delete = dia.findViewById(R.id.delete_note);
+            LinearLayout share = dia.findViewById(R.id.share_note);
+
+            delete.setOnClickListener(v12 -> {
+                mNoteDao.delete(note);
+                dia.dismiss();
+            });
+            share.setOnClickListener(v1 -> {
+                final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(Intent.EXTRA_TEXT, note.getNote_title()+": " + note.getNote_description());
+                intent.setType("text/plain");
+                mContext.startActivity(Intent.createChooser(intent, "Share via"));
+                dia.dismiss();
+            });
+            dia.show();
+            return false;
+        });
     }
 
     @Override
@@ -134,15 +152,22 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         ImageView note_image, timer_set;
         ImageView mCheckBox;
 
+        FontFamily mFontFamily;
+
         public NotesViewHolder(View view) {
             super(view);
             layout = view.findViewById(R.id.constraintLayout);
             note_headline = view.findViewById(R.id.note_headline);
             note_description = view.findViewById(R.id.note_description);
             note_timestamp = view.findViewById(R.id.note_timestamp);
-            note_image = view.findViewById(R.id.note_image);
+       //     note_image = view.findViewById(R.id.note_image);
             timer_set = view.findViewById(R.id.img_timer_set);
             mCheckBox = view.findViewById(R.id.setNoteDone);
+
+            mFontFamily = new FontFamily(mContext);
+            mFontFamily.setRegularFont(note_headline);
+            mFontFamily.setRegularFont(note_description);
+            mFontFamily.setMediumItalicFont(note_timestamp);
         }
     }
 

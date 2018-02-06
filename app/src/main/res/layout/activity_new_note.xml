@@ -11,7 +11,7 @@
     <ImageView
         android:id="@+id/note_bg"
         android:layout_width="298dp"
-        android:layout_height="355dp"
+        android:layout_height="295dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="24dp"
         android:layout_marginStart="24dp"
@@ -40,7 +40,7 @@
     <EditText
         android:id="@+id/edt_noteDescription"
         android:layout_width="255dp"
-        android:layout_height="150dp"
+        android:layout_height="115dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -81,6 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="12dp"
+        android:visibility="gone"
         android:text="@string/note_image_hint"
         app:layout_constraintEnd_toStartOf="@+id/select_image"
         app:layout_constraintHorizontal_bias="0.139"
@@ -93,6 +94,7 @@
         android:layout_height="25dp"
         android:layout_marginEnd="28dp"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/note_bg"
         app:layout_constraintTop_toBottomOf="@+id/switch_reminder"
         app:srcCompat="@drawable/ic_select_image" />

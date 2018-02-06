@@ -19,8 +19,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
         Notification.Builder builder = new Notification.Builder(context);
+        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE);
         builder.setContentTitle("My Title");
         builder.setContentText("This is the Body");
         builder.setSmallIcon(R.drawable.ic_select_image);
