@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
 android {
     compileSdkVersion 26
     defaultConfig {
@@ -16,9 +15,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    realm {
-        syncEnabled = true;
-    }
+
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
@@ -34,7 +31,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:design:26.1.0'
-    compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.android.support:recyclerview-v7:26.1.0'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
@@ -42,10 +38,12 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:1.1.0-alpha1"
     annotationProcessor "android.arch.persistence.room:compiler:1.1.0-alpha1"
     compile 'com.wdullaer:materialdatetimepicker:3.5.0'
-    implementation 'com.karumi:dexter:4.2.0'
     compile "android.arch.lifecycle:extensions:1.1.0"
     annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.uniquestudio:checkbox:1.0.10'
+    compile 'com.google.firebase:firebase-messaging:11.8.0'
+    compile 'com.google.android.gms:play-services-ads:11.8.0'
 
 }
+apply plugin: 'com.google.gms.google-services'
+

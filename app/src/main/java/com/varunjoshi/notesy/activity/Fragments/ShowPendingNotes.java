@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
 import com.varunjoshi.notesy.activity.AppDatabase;
-import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.NewNoteActivity;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 

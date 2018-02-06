@@ -1,6 +1,5 @@
 package com.varunjoshi.notesy.activity;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,22 +20,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
-import com.varunjoshi.notesy.activity.Util.Util;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,19 +105,18 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     }
 
 
-
     @OnClick(R.id.fab_saveNote)
     public void onMFabSaveNoteClicked() {
         Note note = new Note();
-        if (mEdtNoteTitle.getText().toString().trim().length() == 0){
+        if (mEdtNoteTitle.getText().toString().trim().length() == 0) {
             note.setNote_title(null);
-        }else {
+        } else {
             note.setNote_title(mEdtNoteTitle.getText().toString().trim());
         }
-        if(mEdtNoteDescription.getText().toString().trim().length() == 0){
+        if (mEdtNoteDescription.getText().toString().trim().length() == 0) {
             Toast.makeText(this, "Please add a description!", Toast.LENGTH_SHORT).show();
             return;
-        }else {
+        } else {
             note.setNote_description(mEdtNoteDescription.getText().toString().trim());
 
 
@@ -243,7 +233,12 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             Toast.makeText(this, "Please write a note!", Toast.LENGTH_SHORT).show();
             return;
         }
-        intent.putExtra("note_title", note_title);
+        if (note_title.length() > 0)
+            intent.putExtra("note_title", note_title);
+        else
+            intent.putExtra("note_title", "");
+
+        intent.putExtra("note_description", note_description);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(NewNoteActivity.this,
                 1, intent, 0);

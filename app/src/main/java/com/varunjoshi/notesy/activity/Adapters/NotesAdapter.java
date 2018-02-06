@@ -16,10 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.AppDatabase;
-import com.varunjoshi.notesy.activity.MainActivity;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
@@ -77,16 +75,17 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         else
             holder.note_headline.setText(note.getNote_title());
         holder.note_description.setText(note.getNote_description());
-        if (note.isHasReminder())
+        if (note.isHasReminder()) {
             holder.timer_set.setVisibility(View.VISIBLE);
+        }
         else
             holder.timer_set.setVisibility(View.GONE);
 
         Date date = new Date(timestamp.getTime());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
         holder.note_timestamp.setText(dateFormat.format(date));
-        if (note.isHasImage())
-            Picasso.with(mContext).load(note.getImage_path()).into(holder.note_image);
+//        if (note.isHasImage())
+//            Picasso.with(mContext).load(note.getImage_path()).into(holder.note_image);
 
         // 1 Done
         // 0 Not Done
