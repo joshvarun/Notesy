@@ -1,4 +1,4 @@
-package com.varunjoshi.notesy.activity;
+package com.varunjoshi.notesy.activity.Service;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.varunjoshi.notesy.R;
+import com.varunjoshi.notesy.activity.MainActivity;
 
 /**
  * Notesy
@@ -31,6 +32,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         builder.setContentTitle(intent.getStringExtra("note_title"));
         builder.setContentText(intent.getStringExtra("note_description"));
         builder.setSmallIcon(R.drawable.ic_noti_logo);
+        builder.setAutoCancel(false);
+
         Intent notifyIntent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         //to be able to launch your activity from the notification

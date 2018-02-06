@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Model.Note;
+import com.varunjoshi.notesy.activity.Service.AlarmReceiver;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;

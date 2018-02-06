@@ -1,6 +1,7 @@
 package com.varunjoshi.notesy.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.MobileAds;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
 import com.varunjoshi.notesy.activity.Adapters.SectionsPagerAdapter;
@@ -51,10 +51,6 @@ public class TaskViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_view);
         ButterKnife.bind(this);
-
-
-
-
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         mTabLayout.setupWithViewPager(mPager);
@@ -133,6 +129,14 @@ public class TaskViewActivity extends AppCompatActivity {
             case R.id.action_about:
                 break;
             case R.id.action_share:
+                try {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("text/plain");
+                    i.putExtra(Intent.EXTRA_TEXT, "Notesy: Simplify your notes & set easy reminders!");
+                    startActivity(Intent.createChooser(i, "Share App Via"));
+                } catch(Exception e) {
+                    //e.toString();
+                }
                 break;
         }
         return false;

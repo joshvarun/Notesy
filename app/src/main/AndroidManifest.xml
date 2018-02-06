@@ -23,7 +23,7 @@
         <activity android:name=".activity.TaskViewActivity" />
         <activity android:name=".activity.NewNoteActivity"/>
 
-        <receiver android:name=".activity.AlarmReceiver"/>
+        <receiver android:name=".activity.Service.AlarmReceiver"/>
         <service android:name=".activity.Service.FirebaseMessages"
             android:enabled="true"
             android:exported="true">
@@ -31,6 +31,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="e6d5000566dea88e32f17131eeb9bca3b5a74958" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
