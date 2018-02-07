@@ -32,7 +32,7 @@
         android:layout_marginTop="32dp"
         android:ems="10"
         android:hint="@string/note_title_hint"
-        android:inputType="text"
+        android:inputType="text|textCapSentences"
         app:layout_constraintEnd_toEndOf="@+id/note_bg"
         app:layout_constraintStart_toStartOf="@+id/note_bg"
         app:layout_constraintTop_toTopOf="@+id/note_bg" />
@@ -156,5 +156,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_back" />
 
+    <TextView
+        android:id="@+id/text_noteColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_color"
+        android:text="Note Color"
+        app:layout_constraintBottom_toBottomOf="@+id/note_bg"
+        app:layout_constraintEnd_toStartOf="@+id/note_color_select"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/edt_noteDescription"
+        app:layout_constraintTop_toBottomOf="@+id/text_reminder"
+        app:layout_constraintVertical_bias="0.375" />
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/note_color_select"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:padding="12dp"
+        android:src="@color/note_default"
+        app:layout_constraintBottom_toBottomOf="@+id/note_bg"
+        app:layout_constraintEnd_toEndOf="@+id/switch_reminder"
+        app:layout_constraintTop_toBottomOf="@+id/switch_reminder"
+        app:layout_constraintVertical_bias="1.0" />
 </android.support.constraint.ConstraintLayout>

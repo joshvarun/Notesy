@@ -34,6 +34,8 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class NewNoteActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
@@ -64,10 +66,14 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     @BindView(R.id.img_back)
     ImageView mImgBack;
     AppDatabase mAppDatabase;
+    @BindView(R.id.note_color_select)
+    CircleImageView mNoteColorSelect;
     private Uri mMediaUri;
     private Date mUserReminderDate;
     private long reminderTimestamp;
-    private boolean hasReminder, hasImage;
+    private boolean hasReminder, isColorSet;
+    private String defaultColor = "#29B6F6";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +126,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         } else {
             note.setNote_description(mEdtNoteDescription.getText().toString().trim());
 
-
+            note.setColor(defaultColor);
 //        if (hasImage) {
 //            note.setHasImage(true);
 //            note.setImage_path(mMediaUri.getPath());
@@ -138,7 +144,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             // 0 Not Done
             note.setIsDone(0);
             mAppDatabase.mNoteDao().insert(note);
-
+            setAlarm(reminderTimestamp);
             finish();
         }
     }
@@ -219,7 +225,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         reminderTimestamp = calendar.getTimeInMillis();
         Log.d(TAG, "setTime: " + reminderTimestamp);
         //  mTextReminder.setText(DateFormat.getTimeFormat(this).format(calendar));
-        setAlarm(reminderTimestamp);
+
     }
 
     private void setAlarm(long reminderTimestamp) {
@@ -245,24 +251,6 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 1, intent, 0);
         if (alarmManager != null) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimestamp, pendingIntent);
-        }
-
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_TAKE_PHOTO:
-                    Log.d(TAG, "onActivityResult: " + mMediaUri);
-                    hasImage = true;
-                    break;
-                case REQUEST_PICK_PHOTO:
-                    mMediaUri = data.getData();
-                    hasImage = true;
-                    break;
-
-            }
         }
 
     }
@@ -305,6 +293,30 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                         .show();
                 break;
         }
+    }
+
+    @OnClick(R.id.note_color_select)
+    public void onViewClicked() {
+        final ColorPicker colorPicker = new ColorPicker(this);
+        colorPicker.setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+            @Override
+            public void setOnFastChooseColorListener(int position, int color) {
+                mNoteColorSelect.setColorFilter(color);
+                defaultColor = String.format("#%06X", (0xFFFFFF & color));
+                Log.d(TAG, "setOnFastChooseColorListener: " + defaultColor);
+                isColorSet = true;
+            }
+
+            @Override
+            public void onCancel() {
+                // put code
+            }
+        })
+                .setColors(R.array.mdcolor_400)
+                .setRoundColorButton(true)
+                .setColumns(5)
+                .setTitle("Choose Note Color")
+                .show();
     }
 
     //

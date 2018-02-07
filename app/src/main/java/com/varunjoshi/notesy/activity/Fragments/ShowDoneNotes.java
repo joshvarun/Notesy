@@ -59,7 +59,7 @@ public class ShowDoneNotes extends Fragment {
     }
 
     public void getDoneNotes() {
-        mAdapter = new NotesAdapter(new ArrayList<>(), true, getActivity());
+        mAdapter = new NotesAdapter(new ArrayList<>(), true, mRecyclerView, getActivity());
         mAppDatabase = AppDatabase.getAppDatabase(getActivity());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);

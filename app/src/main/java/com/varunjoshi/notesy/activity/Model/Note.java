@@ -26,6 +26,26 @@ public class Note {
     private long timestamp;
     @ColumnInfo(name = "image_path")
     private String image_path;
+    @ColumnInfo(name = "colorInfo")
+    private String color;
+    @ColumnInfo(name = "alarmId")
+    private int alarmId;
+
+    public int getAlarmId() {
+        return alarmId;
+    }
+
+    public void setAlarmId(int alarmId) {
+        this.alarmId = alarmId;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public int getIsDone() {
         return isDone;

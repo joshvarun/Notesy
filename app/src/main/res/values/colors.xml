@@ -7,17 +7,20 @@
     <color name="text_color">#757575</color>
     <color name="headline_white">#FFFFFF</color>
     <color name="description_white">#e6ffffff</color>
-    <array name="mdcolor_500">
-        <item name="cyan_500">#00BCD4</item>
-        <item name="red_500">#F44336</item>
-        <item name="purple_500">#9C27B0</item>
-        <item name="pink_500">#E91E63</item>
-        <item name="indigo_500">#3F51B5</item>
-        <item name="teal_500">#009688</item>
-        <item name="green_500">#4CAF50</item>
-        <item name="orange_500">#FF9800</item>
-        <item name="blue_grey_500">#607D8B</item>
+    <array name="mdcolor_400">
+        <item name="cyan_400">#26C6DA</item>
+        <item name="red_400">#EF5350</item>
+        <item name="purple_400">#AB47BC</item>
+        <item name="pink_400">#EC407A</item>
+        <item name="indigo_400">#5C6BC0</item>
+        <item name="teal_400">#26A69A</item>
+        <item name="green_400">#66BB6A</item>
+        <item name="orange_400">#FFA726</item>
+        <item name="blue_grey_400">#78909C</item>
+        <item name="blue_400">#29B6F6</item>
     </array>
+
+    <color name="note_default">#29B6F6</color>
 
 
 

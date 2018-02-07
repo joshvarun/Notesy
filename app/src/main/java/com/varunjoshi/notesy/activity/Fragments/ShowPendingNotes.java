@@ -63,7 +63,7 @@ public class ShowPendingNotes extends Fragment {
     }
 
     public void getAllData() {
-        mAdapter = new NotesAdapter(new ArrayList<>(),false ,getActivity());
+        mAdapter = new NotesAdapter(new ArrayList<>(), false, mRecyclerView, getActivity());
         mAppDatabase = AppDatabase.getAppDatabase(getActivity());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);

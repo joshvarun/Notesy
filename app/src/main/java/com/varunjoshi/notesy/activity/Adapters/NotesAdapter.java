@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,14 +39,16 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     private Context mContext;
     private NoteDao mNoteDao;
     private boolean isCompleted;
+    private RecyclerView mRecyclerView;
 
     public NotesAdapter() {
     }
 
-    public NotesAdapter(List<Note> allNotes, boolean isCompleted, Context context) {
+    public NotesAdapter(List<Note> allNotes, boolean isCompleted,RecyclerView mRecyclerView, Context context) {
         this.allNotes = allNotes;
         this.mContext = context;
         this.isCompleted = isCompleted;
+        this.mRecyclerView = mRecyclerView;
         AppDatabase appDatabase = AppDatabase.getAppDatabase(mContext);
         mNoteDao = appDatabase.mNoteDao();
     }
@@ -68,7 +71,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
 
         Note note = allNotes.get(position);
         GradientDrawable bgShape = (GradientDrawable) holder.layout.getBackground();
-        bgShape.setColor(getMatColor("500"));
+        bgShape.setColor(Color.parseColor(note.getColor()));
         Timestamp timestamp = new Timestamp(note.getTimestamp());
         if (note.getNote_title() == null)
             holder.note_headline.setVisibility(View.GONE);
@@ -94,10 +97,19 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             holder.mCheckBox.setVisibility(View.GONE);
         } else {
             holder.mCheckBox.setOnClickListener(v -> {
+                Note note1 = allNotes.get(position);
                 note.setIsDone(1);
                 mNoteDao.update(note);
                 allNotes.remove(position);
                 notifyDataSetChanged();
+                Snackbar.make(mRecyclerView, "Note completed!", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", view -> {
+                            note.setIsDone(0);
+                            mNoteDao.update(note);
+                            allNotes.add(position,note1);
+                        })
+                        .setActionTextColor(mContext.getResources().getColor(android.R.color.holo_red_light ))
+                        .show();
             });
         }
 
@@ -130,19 +142,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     @Override
     public int getItemCount() {
         return allNotes.size();
-    }
-
-    private int getMatColor(String typeColor) {
-        int returnColor = Color.BLACK;
-        int arrayId = mContext.getResources().getIdentifier("mdcolor_" + typeColor, "array", mContext.getPackageName());
-
-        if (arrayId != 0) {
-            TypedArray colors = mContext.getResources().obtainTypedArray(arrayId);
-            int index = (int) (Math.random() * colors.length());
-            returnColor = colors.getColor(index, Color.BLACK);
-            colors.recycle();
-        }
-        return returnColor;
     }
 
     public class NotesViewHolder extends RecyclerView.ViewHolder {
