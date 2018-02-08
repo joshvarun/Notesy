@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.varunjoshi.notesy">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,20 +23,24 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.TaskViewActivity" />
-        <activity android:name=".activity.NewNoteActivity"/>
+        <activity android:name=".activity.NewNoteActivity" />
 
-        <receiver android:name=".activity.Service.AlarmReceiver"/>
-        <service android:name=".activity.Service.FirebaseMessages"
+        <receiver android:name=".activity.Service.AlarmReceiver" />
+
+        <service
+            android:name=".activity.Service.FirebaseMessages"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="e6d5000566dea88e32f17131eeb9bca3b5a74958" />
+
+        <activity android:name=".activity.ViewNoteActivity"></activity>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

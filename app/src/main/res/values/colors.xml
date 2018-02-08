@@ -17,10 +17,10 @@
         <item name="green_400">#66BB6A</item>
         <item name="orange_400">#FFA726</item>
         <item name="blue_grey_400">#78909C</item>
-        <item name="blue_400">#29B6F6</item>
+        <item name="blue_400">#1488CC</item>
     </array>
 
-    <color name="note_default">#29B6F6</color>
+    <color name="note_default">#1488CC</color>
 
 
 

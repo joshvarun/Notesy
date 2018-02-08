@@ -3,13 +3,15 @@ package com.varunjoshi.notesy.activity.Model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Notesy
  * Created by Varun Joshi on Thu, {1/2/18}.
  */
 @Entity(tableName = "notes")
-public class Note {
+public class Note implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private int uid;
     @ColumnInfo(name = "note_title")
@@ -30,6 +32,34 @@ public class Note {
     private String color;
     @ColumnInfo(name = "alarmId")
     private int alarmId;
+
+    protected Note(Parcel in) {
+        uid = in.readInt();
+        note_title = in.readString();
+        note_description = in.readString();
+        hasReminder = in.readByte() != 0;
+        hasImage = in.readByte() != 0;
+        isDone = in.readInt();
+        timestamp = in.readLong();
+        image_path = in.readString();
+        color = in.readString();
+        alarmId = in.readInt();
+    }
+
+    public Note(){
+
+    }
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 
     public int getAlarmId() {
         return alarmId;
@@ -112,5 +142,24 @@ public class Note {
 
     public void setImage_path(String image_path) {
         this.image_path = image_path;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(uid);
+        dest.writeString(note_title);
+        dest.writeString(note_description);
+        dest.writeByte((byte) (hasReminder ? 1 : 0));
+        dest.writeByte((byte) (hasImage ? 1 : 0));
+        dest.writeInt(isDone);
+        dest.writeLong(timestamp);
+        dest.writeString(image_path);
+        dest.writeString(color);
+        dest.writeInt(alarmId);
     }
 }

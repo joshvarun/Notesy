@@ -17,8 +17,7 @@ import io.fabric.sdk.android.Fabric;
 public class MainActivity extends AppCompatActivity {
 
     private static final long SPLASH_DISPLAY_LENGTH = 1500;
-    @BindView(R.id.textView)
-    TextView mTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +25,6 @@ public class MainActivity extends AppCompatActivity {
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        FontFamily fontFamily = new FontFamily(this);
-        fontFamily.setMediumItalicFont(mTextView);
 
         new Handler().postDelayed(() -> {
             /* Create an Intent that will start the Menu-Activity. */

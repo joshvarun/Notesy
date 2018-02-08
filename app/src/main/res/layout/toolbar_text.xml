@@ -13,12 +13,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_back"/>
-    <ImageView
+    <TextView
         android:id="@+id/toolbar_title"
         android:textColor="@android:color/white"
-        android:layout_width="120dp"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="@dimen/headline_text_size"
-        android:src="@drawable/ic_logo_new"/>
+        android:text="Notesy" />
 </android.support.v7.widget.Toolbar>

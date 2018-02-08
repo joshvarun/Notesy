@@ -13,13 +13,15 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.MainActivity;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Notesy
  * Created by Varun Joshi on Thu, {1/2/18}.
  */
 
 public class AlarmReceiver extends BroadcastReceiver {
-    private static final int NOTIFICATION_ID = 3;
+    private final static AtomicInteger NOTIFICATION_ID = new AtomicInteger(0);
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -42,6 +44,10 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(context);
         notificationCompat.defaults |= Notification.DEFAULT_SOUND;
         notificationCompat.defaults |= Notification.DEFAULT_VIBRATE;
-        managerCompat.notify(NOTIFICATION_ID, notificationCompat);
+        managerCompat.notify(getID(), notificationCompat);
+    }
+
+    public static int getID() {
+        return NOTIFICATION_ID.incrementAndGet();
     }
 }

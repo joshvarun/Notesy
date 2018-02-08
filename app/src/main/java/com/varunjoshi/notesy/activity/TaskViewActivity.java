@@ -43,6 +43,12 @@ public class TaskViewActivity extends AppCompatActivity {
     @BindView(R.id.pager)
     ViewPager mPager;
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+    }
+
     SectionsPagerAdapter mSectionsPagerAdapter;
 
 
@@ -56,7 +62,7 @@ public class TaskViewActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mPager);
 
         Toolbar toolbar = findViewById(R.id.toolbar_TaskViewActivity);
-        TextView toolbar_title = toolbar.findViewById(R.id.toolbar_title);
+      //  TextView toolbar_title = toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -65,7 +71,7 @@ public class TaskViewActivity extends AppCompatActivity {
 
 
         FontFamily fontFamily = new FontFamily(this);
-        fontFamily.setMediumFont(toolbar_title);
+       // fontFamily.setMediumFont(toolbar_title);
 
 
         setupViewPager();

@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -28,8 +28,10 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,8 +41,6 @@ import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class NewNoteActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
-    public static final int REQUEST_TAKE_PHOTO = 0;
-    public static final int REQUEST_PICK_PHOTO = 1;
     private static final String TAG = "NewNoteActivity";
     @BindView(R.id.note_bg)
     ImageView mNoteBg;
@@ -68,16 +68,24 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     AppDatabase mAppDatabase;
     @BindView(R.id.note_color_select)
     CircleImageView mNoteColorSelect;
-    private Uri mMediaUri;
+    @BindView(R.id.text_noteColor)
+    TextView mTextNoteColor;
+    private int alarmId;
     private Date mUserReminderDate;
     private long reminderTimestamp;
-    private boolean hasReminder, isColorSet;
-    private String defaultColor = "#29B6F6";
+    private boolean hasReminder;
+    private String defaultColor = "#1488CC";
+    boolean isEdit;
+    Note mNote;
+    CompoundButton.OnCheckedChangeListener listener;
+    Intent mIntent;
 
+    private final static AtomicInteger ALARM_ID = new AtomicInteger(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_new_note);
         setContentView(R.layout.activity_new_note);
         ButterKnife.bind(this);
         mFontFamily = new FontFamily(this);
@@ -85,74 +93,105 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         mFontFamily.setMediumFont(mAddNoteTitle);
         mFontFamily.setRegularFont(mEdtNoteTitle);
         mFontFamily.setRegularFont(mEdtNoteDescription);
+        mFontFamily.setRegularFont(mTextNoteColor);
         mFontFamily.setLightFont(mTextReminder);
         mFontFamily.setLightFont(mTextAddImage);
+        mNote = new Note();
 
-        mSwitchReminder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    hasReminder = true;
-                    Calendar now = Calendar.getInstance();
-                    DatePickerDialog dpd = DatePickerDialog.newInstance(
-                            NewNoteActivity.this,
-                            now.get(Calendar.YEAR),
-                            now.get(Calendar.MONTH),
-                            now.get(Calendar.DAY_OF_MONTH)
-                    );
-                    dpd.show(getFragmentManager(), TAG);
-                } else {
-                    hasReminder = false;
-                    mTextReminder.setText(getResources().getString(R.string.note_reminder_hint));
-                }
+        listener = (buttonView, isChecked) -> {
+            if (isChecked) {
+                hasReminder = true;
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        NewNoteActivity.this,
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+                dpd.show(getFragmentManager(), TAG);
+            } else {
+                hasReminder = false;
+                mTextReminder.setText(getResources().getString(R.string.note_reminder_hint));
             }
-        });
+        };
+
+        mSwitchReminder.setOnCheckedChangeListener(listener);
 
         mAppDatabase = AppDatabase.getAppDatabase(this);
+
+        mIntent = getIntent();
+        isEdit = mIntent.getBooleanExtra("isEdit", false);
+
+        if (isEdit){
+            mNote = mIntent.getParcelableExtra("object");
+            setData();
+        }
+    }
+
+    private void setData() {
+        mAddNoteTitle.setText("Edit Note");
+        mEdtNoteTitle.setText(mNote.getNote_title());
+        mEdtNoteDescription.setText(mNote.getNote_description());
+        if (mNote.isHasReminder()){
+            mSwitchReminder.setOnCheckedChangeListener(null);
+            mSwitchReminder.setChecked(true);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
+            mTextReminder.setText(dateFormat.format(mNote.getTimestamp()));
+            mSwitchReminder.setOnCheckedChangeListener(listener);
+        }
+        mNoteColorSelect.setColorFilter(Color.parseColor(mNote.getColor()));
     }
 
 
     @OnClick(R.id.fab_saveNote)
     public void onMFabSaveNoteClicked() {
-        Note note = new Note();
+       // Note note = new Note();
         if (mEdtNoteTitle.getText().toString().trim().length() == 0) {
-            note.setNote_title(null);
+            mNote.setNote_title("");
         } else {
-            note.setNote_title(mEdtNoteTitle.getText().toString().trim());
+            mNote.setNote_title(mEdtNoteTitle.getText().toString().trim());
         }
         if (mEdtNoteDescription.getText().toString().trim().length() == 0) {
             Toast.makeText(this, "Please add a description!", Toast.LENGTH_SHORT).show();
             return;
         } else {
-            note.setNote_description(mEdtNoteDescription.getText().toString().trim());
+            mNote.setNote_description(mEdtNoteDescription.getText().toString().trim());
 
-            note.setColor(defaultColor);
+            mNote.setColor(defaultColor);
 //        if (hasImage) {
 //            note.setHasImage(true);
 //            note.setImage_path(mMediaUri.getPath());
 //        } else
 //            note.setHasImage(false);
             if (hasReminder) {
-                note.setHasReminder(true);
-                note.setTimestamp(reminderTimestamp);
+                mNote.setHasReminder(true);
+                mNote.setTimestamp(reminderTimestamp);
+                alarmId = getAlarmId();
+                mNote.setAlarmId(alarmId);
+                setAlarm(reminderTimestamp, alarmId);
             } else {
                 Calendar c = Calendar.getInstance();
-                note.setHasReminder(false);
-                note.setTimestamp(c.getTimeInMillis());
+                mNote.setHasReminder(false);
+                mNote.setTimestamp(c.getTimeInMillis());
             }
             // 1 Done
             // 0 Not Done
-            note.setIsDone(0);
-            mAppDatabase.mNoteDao().insert(note);
-            setAlarm(reminderTimestamp);
-            finish();
+            mNote.setIsDone(0);
+            if (isEdit) {
+                mAppDatabase.mNoteDao().update(mNote);
+                startActivity(new Intent(this, TaskViewActivity.class));
+                finish();
+            }
+            else {
+                mAppDatabase.mNoteDao().insert(mNote);
+                finish();
+            }
         }
     }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        mTextReminder.setText(MessageFormat.format("{0}/{1}/{2}", dayOfMonth,
-                monthOfYear + 1, year));
+        mTextReminder.setText(dayOfMonth + (monthOfYear + 1) + year + "");
         setDate(year, monthOfYear, dayOfMonth);
         Calendar now = Calendar.getInstance();
         TimePickerDialog tpd = TimePickerDialog.newInstance(
@@ -163,16 +202,13 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         );
         tpd.show(getFragmentManager(), "Datepickerdialog");
 
-        tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                hasReminder = false;
-                Log.d(TAG, "Dialog was cancelled");
-                Toast.makeText(NewNoteActivity.this, "Please select time to set a reminder.",
-                        Toast.LENGTH_SHORT).show();
-                mSwitchReminder.setChecked(false);
-                mTextReminder.setText(getResources().getString(R.string.note_reminder_hint));
-            }
+        tpd.setOnCancelListener(dialogInterface -> {
+            hasReminder = false;
+            Log.d(TAG, "Dialog was cancelled");
+            Toast.makeText(NewNoteActivity.this, "Please select time to set a reminder.",
+                    Toast.LENGTH_SHORT).show();
+            mSwitchReminder.setChecked(false);
+            mTextReminder.setText(getResources().getString(R.string.note_reminder_hint));
         });
     }
 
@@ -228,7 +264,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
 
     }
 
-    private void setAlarm(long reminderTimestamp) {
+    private void setAlarm(long reminderTimestamp, int alarmId) {
         String note_title = mEdtNoteTitle.getText().toString();
         String note_description = mEdtNoteDescription.getText().toString();
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -248,7 +284,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         intent.putExtra("note_description", note_description);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(NewNoteActivity.this,
-                1, intent, 0);
+                alarmId, intent, 0);
         if (alarmManager != null) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimestamp, pendingIntent);
         }
@@ -260,37 +296,28 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         AlertDialog.Builder builder;
         switch (view.getId()) {
             case R.id.fab_deleteNote:
-                builder = new AlertDialog.Builder(this);
-                builder.setTitle("Alert")
-                        .setMessage("Unsaved changes will be lost.")
-                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                if (mEdtNoteDescription.getText().length() == 0 && mEdtNoteTitle.getText().length() == 0) {
+                    finish();
+                } else {
+                    builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Alert")
+                            .setMessage("Unsaved changes will be lost.")
+                            .setPositiveButton("Continue", (dialog, which) -> finish())
+                            .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                            .show();
+                }
                 break;
             case R.id.img_back:
-
-                builder = new AlertDialog.Builder(this);
-                builder.setTitle("Alert")
-                        .setMessage("Unsaved changes will be lost.")
-                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                if (mEdtNoteDescription.getText().length() == 0 && mEdtNoteTitle.getText().length() == 0) {
+                    finish();
+                } else {
+                    builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Alert")
+                            .setMessage("Unsaved changes will be lost.")
+                            .setPositiveButton("Continue", (dialog, which) -> finish())
+                            .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                            .show();
+                }
                 break;
         }
     }
@@ -304,7 +331,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 mNoteColorSelect.setColorFilter(color);
                 defaultColor = String.format("#%06X", (0xFFFFFF & color));
                 Log.d(TAG, "setOnFastChooseColorListener: " + defaultColor);
-                isColorSet = true;
+
             }
 
             @Override
@@ -319,6 +346,9 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 .show();
     }
 
+    public static int getAlarmId() {
+        return ALARM_ID.incrementAndGet();
+    }
     //
 //    void takePicture() {
 //        mMediaUri = Util.getMediaOutputUri(this);

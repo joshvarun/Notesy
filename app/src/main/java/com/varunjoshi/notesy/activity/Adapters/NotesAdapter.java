@@ -3,7 +3,6 @@ package com.varunjoshi.notesy.activity.Adapters;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.ConstraintLayout;
@@ -21,6 +20,7 @@ import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.AppDatabase;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
+import com.varunjoshi.notesy.activity.ViewNoteActivity;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.sql.Timestamp;
@@ -44,7 +44,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     public NotesAdapter() {
     }
 
-    public NotesAdapter(List<Note> allNotes, boolean isCompleted,RecyclerView mRecyclerView, Context context) {
+    public NotesAdapter(List<Note> allNotes, boolean isCompleted, RecyclerView mRecyclerView, Context context) {
         this.allNotes = allNotes;
         this.mContext = context;
         this.isCompleted = isCompleted;
@@ -80,8 +80,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         holder.note_description.setText(note.getNote_description());
         if (note.isHasReminder()) {
             holder.timer_set.setVisibility(View.VISIBLE);
-        }
-        else
+        } else
             holder.timer_set.setVisibility(View.GONE);
 
         Date date = new Date(timestamp.getTime());
@@ -106,12 +105,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
                         .setAction("UNDO", view -> {
                             note.setIsDone(0);
                             mNoteDao.update(note);
-                            allNotes.add(position,note1);
+                            allNotes.add(position, note1);
                         })
-                        .setActionTextColor(mContext.getResources().getColor(android.R.color.holo_red_light ))
+                        .setActionTextColor(mContext.getResources().getColor(android.R.color.holo_red_light))
                         .show();
             });
         }
+
+        holder.layout.setOnClickListener(v -> mContext.startActivity(new Intent(mContext, ViewNoteActivity.class)
+                .putExtra("object", note)));
 
         holder.layout.setOnLongClickListener(v -> {
             final Dialog dia = new Dialog(mContext);
@@ -125,11 +127,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             delete.setOnClickListener(v12 -> {
                 mNoteDao.delete(note);
                 dia.dismiss();
+                mNoteDao.update(note);
+                allNotes.remove(position);
+                notifyDataSetChanged();
             });
             share.setOnClickListener(v1 -> {
                 final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(Intent.EXTRA_TEXT, note.getNote_title()+": " + note.getNote_description());
+                intent.putExtra(Intent.EXTRA_TEXT, note.getNote_title() + ": " + note.getNote_description());
                 intent.setType("text/plain");
                 mContext.startActivity(Intent.createChooser(intent, "Share via"));
                 dia.dismiss();
@@ -158,7 +163,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             note_headline = view.findViewById(R.id.note_headline);
             note_description = view.findViewById(R.id.note_description);
             note_timestamp = view.findViewById(R.id.note_timestamp);
-       //     note_image = view.findViewById(R.id.note_image);
+            //     note_image = view.findViewById(R.id.note_image);
             timer_set = view.findViewById(R.id.img_timer_set);
             mCheckBox = view.findViewById(R.id.setNoteDone);
 
