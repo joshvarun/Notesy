@@ -1,6 +1,8 @@
 package com.varunjoshi.notesy.activity.Adapters;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,11 +21,13 @@ import android.widget.TextView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.AppDatabase;
 import com.varunjoshi.notesy.activity.Model.Note;
+import com.varunjoshi.notesy.activity.TaskViewActivity;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
 import com.varunjoshi.notesy.activity.ViewNoteActivity;
 import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,29 +72,35 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
 
     @Override
     public void onBindViewHolder(NotesViewHolder holder, int position) {
-
+        Timestamp timestamp, created;
+        Date date, date1;
+        SimpleDateFormat dateFormat, dateFormat1;
+        dateFormat = new SimpleDateFormat("dd MMM yy, HH:mm");
+        dateFormat1 = new SimpleDateFormat("dd MMM yy");
         Note note = allNotes.get(position);
         GradientDrawable bgShape = (GradientDrawable) holder.layout.getBackground();
         bgShape.setColor(Color.parseColor(note.getColor()));
-        Timestamp timestamp = new Timestamp(note.getTimestamp());
+
         if (note.getNote_title() == null)
             holder.note_headline.setVisibility(View.GONE);
         else
             holder.note_headline.setText(note.getNote_title());
         holder.note_description.setText(note.getNote_description());
         if (note.isHasReminder()) {
-            holder.timer_set.setVisibility(View.VISIBLE);
-        } else
-            holder.timer_set.setVisibility(View.GONE);
-
-        Date date = new Date(timestamp.getTime());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-        holder.note_timestamp.setText(dateFormat.format(date));
-//        if (note.isHasImage())
-//            Picasso.with(mContext).load(note.getImage_path()).into(holder.note_image);
-
-        // 1 Done
-        // 0 Not Done
+            timestamp = new Timestamp(note.getTimestamp());
+            created = new Timestamp(note.getCreatedDate());
+            date = new Date(timestamp.getTime());
+            date1 = new Date(created.getTime());
+            holder.ic_notify.setVisibility(View.VISIBLE);
+            holder.note_timestamp.setText(MessageFormat.format("Created: {0} / Reminder: {1}",
+                    dateFormat1.format(date1), dateFormat.format(date)));
+        } else {
+            holder.ic_notify.setVisibility(View.GONE);
+            created = new Timestamp(note.getCreatedDate());
+            date1 = new Date(created.getTime());
+            holder.note_timestamp.setText(MessageFormat.format("Created: {0}",
+                    dateFormat1.format(date1)));
+        }
 
         if (isCompleted) {
             holder.mCheckBox.setVisibility(View.GONE);
@@ -101,14 +111,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
                 mNoteDao.update(note);
                 allNotes.remove(position);
                 notifyDataSetChanged();
-                Snackbar.make(mRecyclerView, "Note completed!", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", view -> {
-                            note.setIsDone(0);
-                            mNoteDao.update(note);
-                            allNotes.add(position, note1);
-                        })
-                        .setActionTextColor(mContext.getResources().getColor(android.R.color.holo_red_light))
-                        .show();
+                cancelAlarm(note.getAlarmId());
+//                Snackbar.make(mRecyclerView, "Note completed!", Snackbar.LENGTH_LONG)
+//                        .setAction("UNDO", view -> {
+//                            note.setIsDone(0);
+//                            mNoteDao.update(note);
+//                            allNotes.add(position, note1);
+//                        })
+//                        .setActionTextColor(mContext.getResources().getColor(android.R.color.holo_red_light))
+//                        .show();
             });
         }
 
@@ -123,7 +134,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
 
             LinearLayout delete = dia.findViewById(R.id.delete_note);
             LinearLayout share = dia.findViewById(R.id.share_note);
+            LinearLayout cancel = dia.findViewById(R.id.cancel_alarm);
 
+            if (note.isHasReminder())
+                cancel.setVisibility(View.VISIBLE);
+            else
+                cancel.setVisibility(View.GONE);
             delete.setOnClickListener(v12 -> {
                 mNoteDao.delete(note);
                 dia.dismiss();
@@ -139,6 +155,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
                 mContext.startActivity(Intent.createChooser(intent, "Share via"));
                 dia.dismiss();
             });
+            cancel.setOnClickListener(v13 -> {
+                cancelAlarm(note.getAlarmId());
+                note.setHasReminder(false);
+                mNoteDao.update(note);
+                notifyDataSetChanged();
+                dia.dismiss();
+            });
             dia.show();
             return false;
         });
@@ -152,8 +175,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     public class NotesViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout layout;
         TextView note_headline, note_description, note_timestamp;
-        ImageView note_image, timer_set;
-        ImageView mCheckBox;
+        ImageView mCheckBox, ic_notify;
 
         FontFamily mFontFamily;
 
@@ -164,14 +186,23 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             note_description = view.findViewById(R.id.note_description);
             note_timestamp = view.findViewById(R.id.note_timestamp);
             //     note_image = view.findViewById(R.id.note_image);
-            timer_set = view.findViewById(R.id.img_timer_set);
             mCheckBox = view.findViewById(R.id.setNoteDone);
-
+            ic_notify = view.findViewById(R.id.ic_notify);
             mFontFamily = new FontFamily(mContext);
             mFontFamily.setRegularFont(note_headline);
             mFontFamily.setRegularFont(note_description);
-            mFontFamily.setMediumItalicFont(note_timestamp);
+            mFontFamily.setLightItalicFont(note_timestamp);
         }
+    }
+
+    public void cancelAlarm(int alarmID){
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent = new Intent(mContext,
+                TaskViewActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                mContext, alarmID, myIntent,     PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.cancel(pendingIntent);
     }
 
 }

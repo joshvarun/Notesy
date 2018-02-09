@@ -4,15 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -21,32 +27,55 @@ import butterknife.OnClick;
 
 public class ViewNoteActivity extends AppCompatActivity {
 
+    private static final String TAG = "ViewNoteActivity";
+    Note mNote;
+    Intent mIntent;
+    FontFamily mFontFamily;
     @BindView(R.id.ic_Back)
     ImageView mIcBack;
     @BindView(R.id.toolbar_title)
     TextView mToolbarTitle;
-    @BindView(R.id.text_note_title)
-    TextView mTextNoteTitle;
-    @BindView(R.id.note_title)
-    TextView mNoteTitle;
-    @BindView(R.id.textNoteDescription)
-    TextView mTextNoteDescription;
-    @BindView(R.id.note_descripiton)
-    TextView mNoteDescription;
-    Note mNote;
-    Intent mIntent;
-    @BindView(R.id.textTime)
-    TextView mTextTime;
-    @BindView(R.id.time)
-    TextView mTime;
-    @BindView(R.id.reminderImg)
-    ImageView mReminderImg;
-
-    FontFamily mFontFamily;
+    @BindView(R.id.txt_note_title)
+    TextView mTxtNoteTitle;
+    @BindView(R.id.title_note)
+    TextView mTitleNote;
     @BindView(R.id.view)
     View mView;
+    @BindView(R.id.view3)
+    View mView3;
+    @BindView(R.id.view2)
+    View mView2;
+    @BindView(R.id.txtNoteDescription)
+    TextView mTxtNoteDescription;
+    @BindView(R.id.description_note)
+    TextView mDescriptionNote;
+    @BindView(R.id.txtReminder)
+    TextView mTxtReminder;
+    @BindView(R.id.txtCreatedOn)
+    TextView mTxtCreatedOn;
+    @BindView(R.id.reminder)
+    TextView mReminder;
+    @BindView(R.id.createdOn)
+    TextView mCreatedOn;
+    @BindView(R.id.scrollView2)
+    ScrollView mScrollView2;
     @BindView(R.id.btnEdtNote)
     FloatingActionButton mBtnEdtNote;
+    @BindView(R.id.adView)
+    AdView mAdView;
+
+//    @BindView(R.id.view)
+//    View mView;
+//    @BindView(R.id.btnEdtNote)
+//    FloatingActionButton mBtnEdtNote;
+//    @BindView(R.id.adView)
+//    AdView mAdView;
+//    @BindView(R.id.view3)
+//    View mView3;
+//    @BindView(R.id.textReminderTime)
+//    TextView mTextReminderTime;
+//    @BindView(R.id.reminderTime)
+//    TextView mReminderTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,35 +91,45 @@ public class ViewNoteActivity extends AppCompatActivity {
         mFontFamily = new FontFamily(this);
 
         mFontFamily.setMediumFont(mToolbarTitle);
-        mFontFamily.setMediumItalicFont(mTextNoteTitle);
-        mFontFamily.setRegularFont(mNoteTitle);
-        mFontFamily.setRegularFont(mNoteDescription);
-        mFontFamily.setRegularFont(mTime);
-        mFontFamily.setMediumItalicFont(mTextNoteDescription);
-        mFontFamily.setMediumItalicFont(mTextTime);
+        mFontFamily.setMediumItalicFont(mTxtNoteTitle);
+        mFontFamily.setRegularFont(mTitleNote);
+        mFontFamily.setRegularFont(mDescriptionNote);
+        mFontFamily.setRegularFont(mCreatedOn);
+        mFontFamily.setRegularFont(mReminder);
+        mFontFamily.setMediumItalicFont(mTxtNoteDescription);
+        mFontFamily.setMediumItalicFont(mTxtReminder);
+        mFontFamily.setMediumItalicFont(mTxtCreatedOn);
+       // mFontFamily.setMediumItalicFont(mTextReminderTime);
 
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
         setData();
     }
 
     private void setData() {
         if (!Objects.equals(mNote.getNote_title(), ""))
-            mNoteTitle.setText(mNote.getNote_title());
+            mTitleNote.setText(mNote.getNote_title());
         else {
-            mNoteTitle.setVisibility(View.GONE);
+            mTitleNote.setVisibility(View.GONE);
             mView.setVisibility(View.GONE);
-            mTextNoteTitle.setVisibility(View.GONE);
+            mTxtNoteTitle.setVisibility(View.GONE);
         }
-        mNoteDescription.setText(mNote.getNote_description());
+        mDescriptionNote.setText(mNote.getNote_description());
         //   mTextTime.setPaintFlags(mTextTime.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
         if (mNote.isHasReminder()) {
-            mTextTime.setText(getResources().getString(R.string.reminder_text));
-            mReminderImg.setVisibility(View.VISIBLE);
+            mTxtReminder.setVisibility(View.VISIBLE);
+            mReminder.setVisibility(View.VISIBLE);
+            SimpleDateFormat dateFormat1 = new SimpleDateFormat("dd MMM yyyy, HH:mm");
+            mReminder.setText(dateFormat1.format(mNote.getTimestamp()));
         } else {
-            mTextTime.setText(getResources().getString(R.string.created_text));
-            mReminderImg.setVisibility(View.GONE);
+            mTxtReminder.setVisibility(View.GONE);
+            mReminder.setVisibility(View.GONE);
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-        mTime.setText(dateFormat.format(mNote.getTimestamp()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+        //Timestamp ts = new Timestamp(mNote.getCreatedDate());
+
+        Log.d(TAG, "setData: "+mNote.getCreatedDate());
+        mCreatedOn.setText(dateFormat.format(mNote.getCreatedDate()));
     }
 
     @OnClick(R.id.ic_Back)
@@ -104,4 +143,6 @@ public class ViewNoteActivity extends AppCompatActivity {
                 .putExtra("object", mNote)
                 .putExtra("isEdit", true));
     }
+
+
 }

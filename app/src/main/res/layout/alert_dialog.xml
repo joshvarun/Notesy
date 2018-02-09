@@ -60,5 +60,33 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/cancel_alarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            app:srcCompat="@drawable/ic_alarm" />
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Cancel Alarm"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+    </LinearLayout>
+
 
 </LinearLayout>

@@ -17,10 +17,10 @@ import java.util.List;
  */
 @Dao
 public interface NoteDao {
-    @Query("SELECT * FROM notes WHERE isDone=0")
+    @Query("SELECT * FROM notes WHERE isDone=0 ORDER BY reminder ASC")
     LiveData<List<Note>> getAll();
 
-    @Query("SELECT * FROM notes WHERE isDone=1")
+    @Query("SELECT * FROM notes WHERE isDone=1 ORDER BY reminder ASC")
     LiveData<List<Note>> getCompletedNotes();
 
     @Insert

@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
 import com.varunjoshi.notesy.activity.AppDatabase;
@@ -43,6 +45,9 @@ public class ShowDoneNotes extends Fragment {
     NoteDao mNoteDao;
     NotesAdapter mAdapter;
 
+    @BindView(R.id.adView)
+    AdView mAdView;
+
     public ShowDoneNotes() {
         // Required empty public constructor
     }
@@ -55,6 +60,8 @@ public class ShowDoneNotes extends Fragment {
         View view = inflater.inflate(R.layout.fragment_show_done_notes, container, false);
         unbinder = ButterKnife.bind(this, view);
         getDoneNotes();
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
         return view;
     }
 

@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
 import com.varunjoshi.notesy.activity.AppDatabase;
@@ -47,6 +49,9 @@ public class ShowPendingNotes extends Fragment {
     AppDatabase mAppDatabase;
     NoteDao mNoteDao;
 
+    @BindView(R.id.adView)
+    AdView mAdView;
+
     public ShowPendingNotes() {
         // Required empty public constructor
     }
@@ -59,6 +64,8 @@ public class ShowPendingNotes extends Fragment {
         View view = inflater.inflate(R.layout.fragment_show_pending_notes, container, false);
         unbinder = ButterKnife.bind(this, view);
         getAllData();
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
         return view;
     }
 

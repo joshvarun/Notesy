@@ -44,11 +44,29 @@ public class Note implements Parcelable {
         image_path = in.readString();
         color = in.readString();
         alarmId = in.readInt();
+        createdDate = in.readLong();
     }
 
-    public Note(){
-
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(uid);
+        dest.writeString(note_title);
+        dest.writeString(note_description);
+        dest.writeByte((byte) (hasReminder ? 1 : 0));
+        dest.writeByte((byte) (hasImage ? 1 : 0));
+        dest.writeInt(isDone);
+        dest.writeLong(timestamp);
+        dest.writeString(image_path);
+        dest.writeString(color);
+        dest.writeInt(alarmId);
+        dest.writeLong(createdDate);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
     public static final Creator<Note> CREATOR = new Creator<Note>() {
         @Override
         public Note createFromParcel(Parcel in) {
@@ -60,6 +78,23 @@ public class Note implements Parcelable {
             return new Note[size];
         }
     };
+
+    public long getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    @ColumnInfo(name = "createdDate")
+    private long createdDate;
+
+
+    public Note(){
+
+    }
+
 
     public int getAlarmId() {
         return alarmId;
@@ -144,22 +179,5 @@ public class Note implements Parcelable {
         this.image_path = image_path;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(uid);
-        dest.writeString(note_title);
-        dest.writeString(note_description);
-        dest.writeByte((byte) (hasReminder ? 1 : 0));
-        dest.writeByte((byte) (hasImage ? 1 : 0));
-        dest.writeInt(isDone);
-        dest.writeLong(timestamp);
-        dest.writeString(image_path);
-        dest.writeString(color);
-        dest.writeInt(alarmId);
-    }
 }

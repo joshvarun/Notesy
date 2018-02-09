@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -27,12 +28,11 @@
 
 
             <TextView
-                android:id="@+id/text_note_title"
+                android:id="@+id/txt_note_title"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="17dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
                 android:text="@string/title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -40,7 +40,7 @@
 
 
             <TextView
-                android:id="@+id/note_title"
+                android:id="@+id/title_note"
                 android:layout_width="0dp"
                 android:layout_height="19dp"
                 android:layout_marginEnd="16dp"
@@ -52,7 +52,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_note_title" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_note_title" />
 
             <View
                 android:id="@+id/view"
@@ -65,8 +65,20 @@
                 android:background="@color/text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/note_title" />
+                app:layout_constraintTop_toBottomOf="@+id/title_note" />
 
+            <View
+                android:id="@+id/view3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:alpha="0.3"
+                android:background="@color/text_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/createdOn" />
             <View
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
@@ -78,10 +90,10 @@
                 android:background="@color/text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/note_descripiton" />
+                app:layout_constraintTop_toBottomOf="@+id/description_note" />
 
             <TextView
-                android:id="@+id/textNoteDescription"
+                android:id="@+id/txtNoteDescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -94,7 +106,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/view" />
 
             <TextView
-                android:id="@+id/note_descripiton"
+                android:id="@+id/description_note"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -105,20 +117,30 @@
                 android:textSize="17sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textNoteDescription" />
+                app:layout_constraintTop_toBottomOf="@+id/txtNoteDescription" />
 
             <TextView
-                android:id="@+id/textTime"
+                android:id="@+id/txtReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Reminder On"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view3" />
+
+            <TextView
+                android:id="@+id/txtCreatedOn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:text="TextView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view2" />
+                android:text="Created On"
+                ads:layout_constraintStart_toStartOf="parent"
+                ads:layout_constraintTop_toBottomOf="@+id/view2" />
 
             <TextView
-                android:id="@+id/time"
+                android:id="@+id/createdOn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -128,21 +150,22 @@
                 android:text="TextView"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
+                ads:layout_constraintEnd_toEndOf="parent"
+                ads:layout_constraintStart_toStartOf="parent"
+                ads:layout_constraintTop_toBottomOf="@+id/txtCreatedOn" />
+
+            <TextView
+                android:id="@+id/reminder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="TextView"
+                android:textColor="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textTime" />
-
-            <ImageView
-                android:id="@+id/reminderImg"
-                android:layout_width="19dp"
-                android:layout_height="20dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/time"
-                app:layout_constraintStart_toEndOf="@+id/textTime"
-                app:layout_constraintTop_toBottomOf="@+id/view2"
-                app:srcCompat="@drawable/ic_reminder_set" />
+                app:layout_constraintTop_toBottomOf="@+id/txtReminder" />
 
 
         </android.support.constraint.ConstraintLayout>
@@ -153,12 +176,25 @@
         android:id="@+id/btnEdtNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        app:fabSize="normal"
+        android:layout_above="@id/adView"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        app:fabSize="normal"
         app:srcCompat="@drawable/ic_edit"
-        android:focusable="true" />
+        tools:layout_editor_absoluteX="312dp"
+        tools:layout_editor_absoluteY="388dp" />
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+
+
 </RelativeLayout>

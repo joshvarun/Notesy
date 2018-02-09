@@ -3,7 +3,6 @@ package com.varunjoshi.notesy.activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +19,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Model.Note;
 import com.varunjoshi.notesy.activity.Service.AlarmReceiver;
@@ -70,12 +71,15 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     CircleImageView mNoteColorSelect;
     @BindView(R.id.text_noteColor)
     TextView mTextNoteColor;
+    @BindView(R.id.adView)
+    AdView mAdView;
     private int alarmId;
     private Date mUserReminderDate;
     private long reminderTimestamp;
     private boolean hasReminder;
     private String defaultColor = "#1488CC";
-    boolean isEdit;
+    boolean isEdit, isAlarmSet;
+    int dayOfMonth, year, monthOfYear;
     Note mNote;
     CompoundButton.OnCheckedChangeListener listener;
     Intent mIntent;
@@ -86,17 +90,18 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_note);
-        setContentView(R.layout.activity_new_note);
         ButterKnife.bind(this);
         mFontFamily = new FontFamily(this);
 
         mFontFamily.setMediumFont(mAddNoteTitle);
         mFontFamily.setRegularFont(mEdtNoteTitle);
         mFontFamily.setRegularFont(mEdtNoteDescription);
-        mFontFamily.setRegularFont(mTextNoteColor);
+        mFontFamily.setLightFont(mTextNoteColor);
         mFontFamily.setLightFont(mTextReminder);
         mFontFamily.setLightFont(mTextAddImage);
         mNote = new Note();
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         listener = (buttonView, isChecked) -> {
             if (isChecked) {
@@ -122,7 +127,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         mIntent = getIntent();
         isEdit = mIntent.getBooleanExtra("isEdit", false);
 
-        if (isEdit){
+        if (isEdit) {
             mNote = mIntent.getParcelableExtra("object");
             setData();
         }
@@ -132,7 +137,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         mAddNoteTitle.setText("Edit Note");
         mEdtNoteTitle.setText(mNote.getNote_title());
         mEdtNoteDescription.setText(mNote.getNote_description());
-        if (mNote.isHasReminder()){
+        if (mNote.isHasReminder()) {
             mSwitchReminder.setOnCheckedChangeListener(null);
             mSwitchReminder.setChecked(true);
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
@@ -145,7 +150,8 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
 
     @OnClick(R.id.fab_saveNote)
     public void onMFabSaveNoteClicked() {
-       // Note note = new Note();
+        Calendar c = Calendar.getInstance();
+        // Note note = new Note();
         if (mEdtNoteTitle.getText().toString().trim().length() == 0) {
             mNote.setNote_title("");
         } else {
@@ -166,23 +172,23 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             if (hasReminder) {
                 mNote.setHasReminder(true);
                 mNote.setTimestamp(reminderTimestamp);
+
                 alarmId = getAlarmId();
                 mNote.setAlarmId(alarmId);
                 setAlarm(reminderTimestamp, alarmId);
             } else {
-                Calendar c = Calendar.getInstance();
                 mNote.setHasReminder(false);
-                mNote.setTimestamp(c.getTimeInMillis());
+                mNote.setTimestamp(0);
             }
             // 1 Done
             // 0 Not Done
             mNote.setIsDone(0);
+            mNote.setCreatedDate(c.getTimeInMillis());
             if (isEdit) {
                 mAppDatabase.mNoteDao().update(mNote);
                 startActivity(new Intent(this, TaskViewActivity.class));
                 finish();
-            }
-            else {
+            } else {
                 mAppDatabase.mNoteDao().insert(mNote);
                 finish();
             }
@@ -191,7 +197,10 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        mTextReminder.setText(dayOfMonth + (monthOfYear + 1) + year + "");
+       // mTextReminder.setText(dayOfMonth + (monthOfYear + 1) + year + "");
+        this.dayOfMonth = dayOfMonth;
+        this.monthOfYear = monthOfYear + 1;
+        this.year = year;
         setDate(year, monthOfYear, dayOfMonth);
         Calendar now = Calendar.getInstance();
         TimePickerDialog tpd = TimePickerDialog.newInstance(
@@ -215,7 +224,8 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     @Override
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
         String s = mTextReminder.getText().toString();
-        mTextReminder.setText(MessageFormat.format("{0} {1}:{2}", s, hourOfDay, minute));
+        mTextReminder.setText(MessageFormat.format("{0}/{1}/{2} {3}:{4}",
+                dayOfMonth, monthOfYear, year, hourOfDay, minute));
         setTime(hourOfDay, minute);
     }
 
@@ -289,6 +299,8 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimestamp, pendingIntent);
         }
 
+        isAlarmSet = true;
+
     }
 
     @OnClick({R.id.fab_deleteNote, R.id.img_back})
@@ -349,6 +361,8 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     public static int getAlarmId() {
         return ALARM_ID.incrementAndGet();
     }
+
+
     //
 //    void takePicture() {
 //        mMediaUri = Util.getMediaOutputUri(this);

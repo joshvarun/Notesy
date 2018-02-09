@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
@@ -35,22 +34,24 @@ import butterknife.ButterKnife;
 
 public class TaskViewActivity extends AppCompatActivity {
 
-    AppDatabase mAppDatabase;
-    NotesAdapter mAdapter;
-    NoteDao mNoteDao;
     @BindView(R.id.tabLayout)
     TabLayout mTabLayout;
     @BindView(R.id.pager)
     ViewPager mPager;
+    SectionsPagerAdapter mSectionsPagerAdapter;
+
+    public static Drawable getTintedDrawable(@NonNull Context context, @NonNull Drawable inputDrawable, @ColorInt int color) {
+        Drawable wrapDrawable = DrawableCompat.wrap(inputDrawable);
+        DrawableCompat.setTint(wrapDrawable, color);
+        DrawableCompat.setTintMode(wrapDrawable, PorterDuff.Mode.SRC_IN);
+        return wrapDrawable;
+    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
     }
-
-    SectionsPagerAdapter mSectionsPagerAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class TaskViewActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mPager);
 
         Toolbar toolbar = findViewById(R.id.toolbar_TaskViewActivity);
-      //  TextView toolbar_title = toolbar.findViewById(R.id.toolbar_title);
+        //  TextView toolbar_title = toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -71,10 +72,11 @@ public class TaskViewActivity extends AppCompatActivity {
 
 
         FontFamily fontFamily = new FontFamily(this);
-       // fontFamily.setMediumFont(toolbar_title);
+        // fontFamily.setMediumFont(toolbar_title);
 
 
         setupViewPager();
+
 
     }
 
@@ -86,6 +88,37 @@ public class TaskViewActivity extends AppCompatActivity {
         mPager.setOffscreenPageLimit(2);
         mTabLayout.setupWithViewPager(mPager);
         mPager.setCurrentItem(0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_about:
+                break;
+            case R.id.action_share:
+                try {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("text/plain");
+                    i.putExtra(Intent.EXTRA_TEXT, "Notesy: Simplify your notes & set easy reminders!");
+                    startActivity(Intent.createChooser(i, "Share App Via"));
+                } catch (Exception e) {
+                    //e.toString();
+                }
+                break;
+        }
+        return false;
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -115,43 +148,5 @@ public class TaskViewActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                break;
-            case R.id.action_share:
-                try {
-                    Intent i = new Intent(Intent.ACTION_SEND);
-                    i.setType("text/plain");
-                    i.putExtra(Intent.EXTRA_TEXT, "Notesy: Simplify your notes & set easy reminders!");
-                    startActivity(Intent.createChooser(i, "Share App Via"));
-                } catch(Exception e) {
-                    //e.toString();
-                }
-                break;
-        }
-        return false;
-    }
-
-    public static Drawable getTintedDrawable(@NonNull Context context, @NonNull Drawable inputDrawable, @ColorInt int color) {
-        Drawable wrapDrawable = DrawableCompat.wrap(inputDrawable);
-        DrawableCompat.setTint(wrapDrawable, color);
-        DrawableCompat.setTintMode(wrapDrawable, PorterDuff.Mode.SRC_IN);
-        return wrapDrawable;
     }
 }

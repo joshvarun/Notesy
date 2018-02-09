@@ -17,12 +17,12 @@ public class FontFamily {
     private Typeface tfBold, tfLightItalic, tfLight, tfMedium, tfMediumItalic, tfRegular;
 
     public FontFamily(Context context) {
-        tfBold = Typeface.createFromAsset(context.getAssets(), "Poppins-Bold.ttf");
-        tfLightItalic = Typeface.createFromAsset(context.getAssets(), "Poppins-LightItalic.ttf");
-        tfLight = Typeface.createFromAsset(context.getAssets(), "Poppins-Light.ttf");
-        tfMedium = Typeface.createFromAsset(context.getAssets(), "Poppins-Medium.ttf");
-        tfMediumItalic = Typeface.createFromAsset(context.getAssets(), "Poppins-MediumItalic.ttf");
-        tfRegular = Typeface.createFromAsset(context.getAssets(), "Poppins-Regular.ttf");
+        tfBold = Typeface.createFromAsset(context.getAssets(), "Muli-Bold.ttf");
+        tfLightItalic = Typeface.createFromAsset(context.getAssets(), "Muli-LightItalic.ttf");
+        tfLight = Typeface.createFromAsset(context.getAssets(), "Muli-Light.ttf");
+        tfMedium = Typeface.createFromAsset(context.getAssets(), "Muli-SemiBold.ttf");
+        tfMediumItalic = Typeface.createFromAsset(context.getAssets(), "Muli-SemiBoldItalic.ttf");
+        tfRegular = Typeface.createFromAsset(context.getAssets(), "Muli-Regular.ttf");
     }
 
     public void setBoldFont(View v) {
