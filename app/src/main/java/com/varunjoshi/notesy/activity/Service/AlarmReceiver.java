@@ -6,8 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.varunjoshi.notesy.R;
@@ -25,16 +23,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
         Notification.Builder builder = new Notification.Builder(context);
         builder.setLights(Color.BLUE, 500, 500);
 
         builder.setContentTitle(intent.getStringExtra("note_title"));
         builder.setContentText(intent.getStringExtra("note_description"));
         builder.setSmallIcon(R.drawable.ic_noti_logo);
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(true);
 
         Intent notifyIntent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);

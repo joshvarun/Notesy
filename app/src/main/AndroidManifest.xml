@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,13 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.TaskViewActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.NewNoteActivity"
+        <activity
+            android:name=".activity.TaskViewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.NewNoteActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.ViewNoteActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ViewNoteActivity"
+            android:screenOrientation="portrait" />
 
         <receiver android:name=".activity.Service.AlarmReceiver" />
 
@@ -46,9 +50,10 @@
             android:name="io.fabric.ApiKey"
             android:value="e6d5000566dea88e32f17131eeb9bca3b5a74958" />
 
-       <activity android:name="com.google.android.gms.ads.AdActivity"
-           android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+        <activity android:name=".activity.AboutActivity"></activity>
     </application>
 
 </manifest>

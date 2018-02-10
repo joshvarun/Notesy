@@ -283,13 +283,13 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             note_title = "";
         }
         if (note_description.length() == 0) {
-            Toast.makeText(this, "Please write a note!", Toast.LENGTH_SHORT).show();
-            return;
+            note_description="";
         }
         if (note_title.length() > 0)
             intent.putExtra("note_title", note_title);
         else
             intent.putExtra("note_title", "");
+
 
         intent.putExtra("note_description", note_description);
 

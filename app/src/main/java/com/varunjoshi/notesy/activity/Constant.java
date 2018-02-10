@@ -5,5 +5,6 @@ package com.varunjoshi.notesy.activity;
  */
 
 public class Constant {
-    public static final int alarmId = 0;
+    public static double appVersion = 1.0;
+    public static String banner_id ="ca-app-pub-1211285924007786/7935005974";
 }

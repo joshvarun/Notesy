@@ -19,12 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.varunjoshi.notesy.R;
-import com.varunjoshi.notesy.activity.Adapters.NotesAdapter;
 import com.varunjoshi.notesy.activity.Adapters.SectionsPagerAdapter;
 import com.varunjoshi.notesy.activity.Fragments.ShowDoneNotes;
 import com.varunjoshi.notesy.activity.Fragments.ShowPendingNotes;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
-import com.varunjoshi.notesy.activity.dao.NoteDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,11 +71,7 @@ public class TaskViewActivity extends AppCompatActivity {
 
         FontFamily fontFamily = new FontFamily(this);
         // fontFamily.setMediumFont(toolbar_title);
-
-
         setupViewPager();
-
-
     }
 
     private void setupViewPager() {
@@ -106,12 +100,14 @@ public class TaskViewActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.action_share:
                 try {
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("text/plain");
-                    i.putExtra(Intent.EXTRA_TEXT, "Notesy: Simplify your notes & set easy reminders!");
+                    i.putExtra(Intent.EXTRA_TEXT,
+                            "Notesy: Simplify your notes & set easy reminders! https://play.google.com/store/apps/details?id=com.varunjoshi.notesy");
                     startActivity(Intent.createChooser(i, "Share App Via"));
                 } catch (Exception e) {
                     //e.toString();

@@ -12,5 +12,5 @@
     <string name="reminder_text">Reminder Set</string>
     <string name="created_text">Created On</string>
 
-    <string name="admob_banner_Ad"></string>
+    <string name="admob_banner_Ad">ca-app-pub-XX/XX</string>
 </resources>
