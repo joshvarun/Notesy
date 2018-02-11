@@ -12,5 +12,8 @@
     <string name="reminder_text">Reminder Set</string>
     <string name="created_text">Created On</string>
 
-    <string name="admob_banner_Ad">ca-app-pub-XX/XX</string>
+    <string name="admob_banner_Ad">ca-app-pub-xxxxxxxxxxxxxx/xxxxxxxx</string>
+    <string name="appwidget_text">Notesy Widget</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
 </resources>

@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        MobileAds.initialize(this, "ca-app-pub-XX~XX");
+        MobileAds.initialize(this, "ca-app-pub-xxxxxxxxxxx~xxxxxxxxxx");
         new Handler().postDelayed(() -> {
             /* Create an Intent that will start the Menu-Activity. */
             Intent mainIntent = new Intent(MainActivity.this, TaskViewActivity.class);

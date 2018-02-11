@@ -1,8 +1,5 @@
 package com.varunjoshi.notesy.activity;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,8 +20,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.varunjoshi.notesy.R;
 import com.varunjoshi.notesy.activity.Model.Note;
-import com.varunjoshi.notesy.activity.Service.AlarmReceiver;
 import com.varunjoshi.notesy.activity.Util.FontFamily;
+import com.varunjoshi.notesy.activity.Util.Util;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -32,7 +29,6 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,18 +69,16 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     TextView mTextNoteColor;
     @BindView(R.id.adView)
     AdView mAdView;
-    private int alarmId;
-    private Date mUserReminderDate;
-    private long reminderTimestamp;
-    private boolean hasReminder;
-    private String defaultColor = "#1488CC";
     boolean isEdit, isAlarmSet;
     int dayOfMonth, year, monthOfYear;
     Note mNote;
     CompoundButton.OnCheckedChangeListener listener;
     Intent mIntent;
-
-    private final static AtomicInteger ALARM_ID = new AtomicInteger(0);
+    private int alarmId;
+    private Date mUserReminderDate;
+    private long reminderTimestamp;
+    private boolean hasReminder;
+    private String defaultColor = "#1488CC";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,11 +152,15 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             mNote.setNote_title(mEdtNoteTitle.getText().toString().trim());
         }
         if (mEdtNoteDescription.getText().toString().trim().length() == 0) {
-            Toast.makeText(this, "Please add a description!", Toast.LENGTH_SHORT).show();
-            return;
+            mNote.setNote_description("");
         } else {
             mNote.setNote_description(mEdtNoteDescription.getText().toString().trim());
+        }
 
+        if (mEdtNoteTitle.getText().toString().length() == 0 &&
+                mEdtNoteDescription.getText().toString().length() == 0){
+            finish();
+        }else {
             mNote.setColor(defaultColor);
 //        if (hasImage) {
 //            note.setHasImage(true);
@@ -173,9 +171,11 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 mNote.setHasReminder(true);
                 mNote.setTimestamp(reminderTimestamp);
 
-                alarmId = getAlarmId();
+                alarmId = Util.getAlarmId();
                 mNote.setAlarmId(alarmId);
-                setAlarm(reminderTimestamp, alarmId);
+                isAlarmSet = Util.setAlarm(this, reminderTimestamp, alarmId,
+                        mEdtNoteTitle.getText().toString().trim(),
+                        mEdtNoteDescription.getText().toString().trim());
             } else {
                 mNote.setHasReminder(false);
                 mNote.setTimestamp(0);
@@ -184,6 +184,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
             // 0 Not Done
             mNote.setIsDone(0);
             mNote.setCreatedDate(c.getTimeInMillis());
+            Log.d(TAG, "onMFabSaveNoteClicked: created" + c.getTimeInMillis());
             if (isEdit) {
                 mAppDatabase.mNoteDao().update(mNote);
                 startActivity(new Intent(this, TaskViewActivity.class));
@@ -197,7 +198,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-       // mTextReminder.setText(dayOfMonth + (monthOfYear + 1) + year + "");
+        // mTextReminder.setText(dayOfMonth + (monthOfYear + 1) + year + "");
         this.dayOfMonth = dayOfMonth;
         this.monthOfYear = monthOfYear + 1;
         this.year = year;
@@ -225,7 +226,7 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
         String s = mTextReminder.getText().toString();
         mTextReminder.setText(MessageFormat.format("{0}/{1}/{2} {3}:{4}",
-                dayOfMonth, monthOfYear, year, hourOfDay, minute));
+                dayOfMonth, monthOfYear, year + "", hourOfDay, minute));
         setTime(hourOfDay, minute);
     }
 
@@ -271,35 +272,6 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
         reminderTimestamp = calendar.getTimeInMillis();
         Log.d(TAG, "setTime: " + reminderTimestamp);
         //  mTextReminder.setText(DateFormat.getTimeFormat(this).format(calendar));
-
-    }
-
-    private void setAlarm(long reminderTimestamp, int alarmId) {
-        String note_title = mEdtNoteTitle.getText().toString();
-        String note_description = mEdtNoteDescription.getText().toString();
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(NewNoteActivity.this, AlarmReceiver.class);
-        if (note_title.length() == 0) {
-            note_title = "";
-        }
-        if (note_description.length() == 0) {
-            note_description="";
-        }
-        if (note_title.length() > 0)
-            intent.putExtra("note_title", note_title);
-        else
-            intent.putExtra("note_title", "");
-
-
-        intent.putExtra("note_description", note_description);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(NewNoteActivity.this,
-                alarmId, intent, 0);
-        if (alarmManager != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimestamp, pendingIntent);
-        }
-
-        isAlarmSet = true;
 
     }
 
@@ -356,10 +328,6 @@ public class NewNoteActivity extends AppCompatActivity implements DatePickerDial
                 .setColumns(5)
                 .setTitle("Choose Note Color")
                 .show();
-    }
-
-    public static int getAlarmId() {
-        return ALARM_ID.incrementAndGet();
     }
 
 
